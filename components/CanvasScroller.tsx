@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useScroll, useMotionValueEvent } from "framer-motion";
 
-export default function HeroCanvas() {
+export default function CanvasScroller() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { scrollYProgress } = useScroll();
     const [images, setImages] = useState<HTMLImageElement[]>([]);
@@ -17,14 +17,12 @@ export default function HeroCanvas() {
 
         for (let i = 1; i <= totalFrames; i++) {
             const img = new Image();
-            // Placeholder path: assumes images are in public/images/sequence/
             img.src = `/images/sequence/${i}.webp`;
             img.onload = () => {
                 loadedCount++;
                 if (loadedCount === totalFrames) setImagesLoaded(true);
             };
             img.onerror = () => {
-                // If images are invalid/missing, we still mark as loaded to allow fallback
                 loadedCount++;
                 if (loadedCount === totalFrames) setImagesLoaded(true);
             };
@@ -33,14 +31,14 @@ export default function HeroCanvas() {
         setImages(loadedImages);
     }, []);
 
-    // Update Canvas Size
+    // Responsive Canvas Sizing
     useEffect(() => {
         const handleResize = () => {
             const canvas = canvasRef.current;
             if (canvas) {
+                // Set canvas dimensions to match window
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                // Trigger a redraw if needed, or wait for scroll
             }
         };
 
@@ -50,8 +48,8 @@ export default function HeroCanvas() {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Draw Logic
-    const draw = (progress: number) => {
+    // Draw Function
+    const renderFrame = (progress: number) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d");
@@ -66,18 +64,17 @@ export default function HeroCanvas() {
         const activeImg = images[frameIndex];
 
         if (activeImg && activeImg.naturalHeight > 0) {
-            // Calculate scale to "contain" or "cover"
-            // We want the cup to be prominent. Contain is safer.
+            // "Contain" logic
             const imgAspect = activeImg.width / activeImg.height;
             const canvasAspect = width / height;
 
             let drawWidth, drawHeight;
 
             if (canvasAspect > imgAspect) {
-                drawHeight = height * 0.8; // 80% height
+                drawHeight = height * 0.9;
                 drawWidth = drawHeight * imgAspect;
             } else {
-                drawWidth = width * 0.8; // 80% width
+                drawWidth = width * 0.9;
                 drawHeight = drawWidth / imgAspect;
             }
 
@@ -86,43 +83,51 @@ export default function HeroCanvas() {
 
             ctx.drawImage(activeImg, x, y, drawWidth, drawHeight);
         } else {
-            // Fallback Drawing (Teal Cup Representation)
+            // Fallback Visual
             const centerX = width / 2;
             const centerY = height / 2;
 
-            // Draw a Teal Circle/Cup shape
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            const scale = 1 + progress * 0.5;
+            ctx.scale(scale, scale);
+
+            // Outer Glow
+            ctx.shadowColor = "rgba(0, 137, 123, 0.5)";
+            ctx.shadowBlur = 50;
+
             ctx.fillStyle = "#00897B";
             ctx.beginPath();
-            // Scale circle slightly with scroll
-            const scale = 1 + progress * 0.2;
-            ctx.arc(centerX, centerY, 150 * scale, 0, 2 * Math.PI);
+            ctx.arc(0, 0, 150, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Add Shadow
-            ctx.shadowColor = "rgba(0,0,0,0.5)";
-            ctx.shadowBlur = 20;
-
-            // Text
-            ctx.font = "bold 24px Oswald, sans-serif";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.fillText("THE SIGNATURE CAP", centerX, centerY);
+            // Add Text
             ctx.shadowColor = "transparent";
+            ctx.fillStyle = "white";
+            ctx.font = "bold 24px Oswald, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            // We can rotate the text slightly?
+            ctx.rotate(progress * Math.PI);
+            ctx.fillText("THE SIGNATURE CAP", 0, 0);
+
+            ctx.restore();
         }
     };
 
     useMotionValueEvent(scrollYProgress, "change", (latest) => {
-        draw(latest);
+        requestAnimationFrame(() => renderFrame(latest));
     });
 
-    // Initial draw to show something before scroll
+    // Initial render
     useEffect(() => {
-        draw(0);
-    }, [imagesLoaded]); // Redraw when images report loaded (or failed and fallback ready)
+        if (imagesLoaded) renderFrame(scrollYProgress.get());
+    }, [imagesLoaded]);
 
     return (
-        <div className="fixed top-0 left-0 w-full h-screen z-10 pointer-events-none sticky top-0">
-            <canvas ref={canvasRef} className="block w-full h-full" />
-        </div>
+        <canvas
+            ref={canvasRef}
+            className="fixed inset-0 z-0 pointer-events-none w-full h-full object-contain"
+        />
     );
 }

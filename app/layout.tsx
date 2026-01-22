@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Oswald, Outfit } from "next/font/google";
 import "./globals.css";
-import SmoothScrolling from "@/components/SmoothScrolling";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const oswald = Oswald({
   subsets: ["latin"],
@@ -30,9 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${oswald.variable} ${outfit.variable} antialiased`}>
       <body className="bg-cap-dark text-white overflow-x-hidden selection:bg-cap-teal selection:text-white">
-        <SmoothScrolling>
+        <SmoothScroll>
           {children}
-        </SmoothScrolling>
+        </SmoothScroll>
       </body>
     </html>
   );

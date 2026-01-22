@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
-import HeroCanvas from "@/components/HeroCanvas";
-import BokehBackground from "@/components/BokehBackground";
-import TextParallax from "@/components/TextParallax";
+import CanvasScroller from "@/components/CanvasScroller";
+import BokehOverlay from "@/components/BokehOverlay";
+import TextSection from "@/components/TextSection";
 import MarqueeStrip from "@/components/MarqueeStrip";
 import SpecsGrid from "@/components/SpecsGrid";
 import CheckoutCard from "@/components/CheckoutCard";
@@ -9,19 +9,30 @@ import { content } from "@/data/content";
 
 export default function Home() {
   return (
-    <main className="min-h-screen relative w-full overflow-hidden bg-cap-dark text-white">
+    <main className="relative w-full bg-cap-dark text-white">
       <Navbar />
 
-      {/* Fixed Elements */}
-      <BokehBackground />
-      <HeroCanvas />
+      {/* Background Layer (Fixed) */}
+      <CanvasScroller />
+      <BokehOverlay />
 
-      {/* Scrollable Content */}
-      <div className="relative z-20 w-full flex flex-col">
+      {/* Main Scroll Container */}
+      {/* 
+         Structure Logic:
+         Outer Wrapper: h-[600vh] creating scroll space
+         We are NOT using h-[600vh] on body but a massive wrapper if needed.
+         However, for standard scrollytelling mixed with other content, 
+         we just need enough vertical space.
+         
+         The user asked for:
+         "Outer Wrapper: A div with a massive height (e.g., h-[600vh]) to create scrollable space."
+         "Foreground Layer (Relative): A container with z-index: 10 that holds the text sections."
+      */}
 
-        {/* Hero Section */}
-        <header className="h-screen w-full flex flex-col items-center justify-center pointer-events-none px-4">
-          <div className="text-center relative z-30 mt-[30vh] md:mt-[40vh]">
+      <div className="relative z-10">
+        {/* 0vh - 100vh: Empty space for Hero Frame */}
+        <section className="h-screen w-full flex flex-col items-center justify-center pointer-events-none">
+          <div className="text-center relative z-20 mt-[30vh]">
             <div className="inline-block px-4 py-1 border border-cap-teal/50 rounded-full mb-6 backdrop-blur-md bg-black/20">
               <span className="font-outfit text-cap-teal tracking-[0.3em] text-xs md:text-sm font-bold uppercase">{content.hero.badge}</span>
             </div>
@@ -32,30 +43,40 @@ export default function Home() {
               {content.hero.subtitle}
             </p>
           </div>
+        </section>
 
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
-            <span className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white to-transparent"></span>
-            <span className="text-[10px] font-outfit uppercase tracking-widest text-white">Scroll</span>
-          </div>
-        </header>
+        {/* Text Sections (Scrollytelling) */}
+        {/* We just render them normally. As usage scrolls, the fixed canvas updates. */}
+        <div className="flex flex-col">
+          {content.scrollytelling.map((item) => (
+            <TextSection
+              key={item.id}
+              title={item.text}
+              description={item.subtext}
+              align={item.align as "left" | "right" | "center"}
+            />
+          ))}
+        </div>
 
-        {/* Storytelling */}
-        <TextParallax />
+        <div className="h-[20vh]" /> {/* Extra breathing room */}
 
-        {/* Marquee */}
         <MarqueeStrip />
 
-        {/* Specs */}
-        <SpecsGrid />
-
-        {/* Checkout */}
-        <CheckoutCard />
-
-        {/* Simple Footer */}
-        <footer className="w-full py-8 border-t border-white/5 bg-black text-center relative z-30">
-          <p className="text-white/30 font-outfit text-xs tracking-widest uppercase">© 2026 CAP Coffee. All Rights Reserved.</p>
-        </footer>
+        <div className="bg-black/80 backdrop-blur-xl relative z-20 pb-20">
+          <SpecsGrid />
+          <CheckoutCard />
+          <footer className="w-full py-8 border-t border-white/5 bg-black text-center">
+            <p className="text-white/30 font-outfit text-xs tracking-widest uppercase">© 2026 CAP Coffee. All Rights Reserved.</p>
+          </footer>
+        </div>
       </div>
+
+      {/* Ensure total height is sufficient if content is short, but with sections it should be fine. 
+          If strictly following "wrapper with massive height", we could force it, 
+          but natural height is better for responsive. 
+          The user prompt "Outer Wrapper: A div with a massive height (e.g., h-[600vh])"
+          is essentially achieved by having multiple sections.
+      */}
     </main>
   );
 }
