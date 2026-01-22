@@ -40,11 +40,15 @@ export default function CanvasScroller({ scrollYProgress }: CanvasScrollerProps)
         const handleResize = () => {
             const canvas = canvasRef.current;
             if (canvas) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                // Trigger a redraw if needed, ideally we just wait for next frame or invoke renderFrame here
-                // with current scroll -- but passing scroll value down here is tricky without reading it. 
-                // We'll let the next scroll / rAF handle it or just force a specific frame if easy.
+                const dpr = window.devicePixelRatio || 1;
+                // Set internal resolution to match device pixel ratio for sharp rendering
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+
+                // Ensure the context knows we might want to use this scale if we were drawing primitives,
+                // but since we calculate draw dimensions based on canvas.width (physical), we don't strictly *need* ctx.scale()
+                // unless we want to use CSS logic coordinates. 
+                // However, our renderFrame logic uses canvas.width directly, so it adapts to physical pixels automatically.
             }
         };
 
