@@ -2,29 +2,29 @@
 
 import { motion } from "framer-motion";
 
-interface TextSectionProps {
+interface Props {
     title: string;
     description?: string;
     align: "left" | "right" | "center";
 }
 
-export default function TextSection({ title, description, align }: TextSectionProps) {
+export default function TextSection({ title, description, align }: Props) {
     const xAnimate = align === "left" ? -100 : align === "right" ? 100 : 0;
-    const yAnimate = align === "center" ? 100 : 0; // Fade up for center
+    const yAnimate = align === "center" ? 50 : 0;
 
     return (
-        <section className={`min-h-screen flex items-center w-full px-6 md:px-20 py-24 ${align === "left" ? "justify-start text-left" :
+        <div className={`w-full flex ${align === "left" ? "justify-start text-left" :
                 align === "right" ? "justify-end text-right" :
                     "justify-center text-center"
             }`}>
             <motion.div
                 initial={{ opacity: 0, x: xAnimate, y: yAnimate }}
                 whileInView={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ duration: 1, ease: "circOut" }}
-                viewport={{ margin: "-20% 0px -20% 0px" }}
-                className="max-w-4xl"
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                viewport={{ amount: 0.5, once: false }} // Re-trigger potentially
+                className="max-w-4xl px-8"
             >
-                <h2 className="text-6xl md:text-8xl font-bold font-oswald text-white uppercase leading-[0.9] drop-shadow-lg mb-6">
+                <h2 className="text-6xl md:text-8xl font-bold font-oswald text-white uppercase leading-none drop-shadow-xl mb-4">
                     {title}
                 </h2>
                 {description && (
@@ -33,6 +33,6 @@ export default function TextSection({ title, description, align }: TextSectionPr
                     </p>
                 )}
             </motion.div>
-        </section>
+        </div>
     );
 }

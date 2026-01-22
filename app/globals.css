@@ -2,13 +2,11 @@
 
 @theme {
   --color-cap-teal: #00897B;
-  --color-cap-dark: #050505;
-  --animate-slow-spin: spin 20s linear infinite;
+  --color-cap-black: #050505;
+  --color-cap-gold: #FFD700;
+  --font-oswald: var(--font-oswald);
+  --font-outfit: var(--font-outfit);
 }
-
-/* Font variables will be defined in layout.tsx via next/font and mapped to CSS variables there, 
-   but we can reference them here if we knew the names. 
-   Usually Next.js injects them. I will assume --font-oswald and --font-outfit. */
 
 :root {
   --background: #050505;
@@ -16,35 +14,22 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--color-cap-black);
   color: var(--foreground);
-  /* The font family will be set on the className in layout, but we can set default here */
   font-family: var(--font-outfit), sans-serif;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* We rely on Lenis for scrolling, but this prevents native double scrollbars mostly */
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-oswald), sans-serif;
-}
-
-/* Custom Scrollbar */
+/* Hide Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
-::-webkit-scrollbar-track {
-  background: #050505; 
-}
-::-webkit-scrollbar-thumb {
-  background: #00897B;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #00695c;
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 ::selection {
-  background: #00897B;
+  background: var(--color-cap-teal);
   color: white;
 }

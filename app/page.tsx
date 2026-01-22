@@ -1,82 +1,103 @@
-import Navbar from "@/components/Navbar";
+"use client";
+
+import { useScroll } from "framer-motion";
+import { useRef } from "react";
 import CanvasScroller from "@/components/CanvasScroller";
 import BokehOverlay from "@/components/BokehOverlay";
+import SmoothScroll from "@/components/SmoothScroll";
 import TextSection from "@/components/TextSection";
-import MarqueeStrip from "@/components/MarqueeStrip";
-import SpecsGrid from "@/components/SpecsGrid";
-import CheckoutCard from "@/components/CheckoutCard";
-import { content } from "@/data/content";
+import { Navbar, Marquee, BuyCard } from "@/components/Interface";
+import { product } from "@/data/content";
 
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Track scroll of the entire window/document
+  const { scrollYProgress } = useScroll({
+    target: containerRef, // Track this container specifically or default to window if undefined
+    offset: ["start start", "end end"]
+  });
+
   return (
-    <main className="relative w-full bg-cap-dark text-white">
+    <main ref={containerRef} className="relative w-full bg-cap-black text-white">
       <Navbar />
 
-      {/* Background Layer (Fixed) */}
-      <CanvasScroller />
-      <BokehOverlay />
+      {/* Fixed Background Layer */}
+      <div className="fixed inset-0 z-0">
+        <CanvasScroller scrollYProgress={scrollYProgress} />
+        <BokehOverlay />
+      </div>
 
-      {/* Main Scroll Container */}
-      {/* 
-         Structure Logic:
-         Outer Wrapper: h-[600vh] creating scroll space
-         We are NOT using h-[600vh] on body but a massive wrapper if needed.
-         However, for standard scrollytelling mixed with other content, 
-         we just need enough vertical space.
-         
-         The user asked for:
-         "Outer Wrapper: A div with a massive height (e.g., h-[600vh]) to create scrollable space."
-         "Foreground Layer (Relative): A container with z-index: 10 that holds the text sections."
-      */}
+      {/* Scrollable Structure with specific mapping */}
+      <div className="relative z-10 w-full flex flex-col">
 
-      <div className="relative z-10">
-        {/* 0vh - 100vh: Empty space for Hero Frame */}
-        <section className="h-screen w-full flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-center relative z-20 mt-[30vh]">
-            <div className="inline-block px-4 py-1 border border-cap-teal/50 rounded-full mb-6 backdrop-blur-md bg-black/20">
-              <span className="font-outfit text-cap-teal tracking-[0.3em] text-xs md:text-sm font-bold uppercase">{content.hero.badge}</span>
-            </div>
-            <h1 className="text-5xl md:text-8xl lg:text-9xl font-bold font-oswald text-white uppercase tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
-              {content.hero.title}
+        {/* 
+             Total Height Logic:
+             We need enough height to scroll through the sequence.
+             User suggested massive height E.g. 600vh.
+             
+             Orchestration:
+             0-100vh: Hero Empty
+             100-200vh: Section 1
+             200-300vh: Section 2
+             300-400vh: Section 3
+             400-500vh: Spacing / Transition
+             Bottom: Footer/BuyCard
+          */}
+
+        {/* 0vh - 100vh: Hero Placeholder */}
+        <section className="h-screen w-full flex items-center justify-center pointer-events-none">
+          {/* Center Title for Hero Frame */}
+          <div className="text-center z-10 mt-[20vh]">
+            <p className="text-cap-teal font-outfit tracking-[0.4em] text-sm font-bold uppercase mb-4">Est. 2026</p>
+            <h1 className="text-[12vw] leading-[0.8] font-oswald font-bold text-white uppercase drop-shadow-2xl">
+              {product.sections[0].title}
             </h1>
-            <p className="text-lg md:text-2xl font-outfit font-light text-gray-300 tracking-[0.2em] uppercase opacity-80">
-              {content.hero.subtitle}
-            </p>
+            <p className="text-2xl font-outfit uppercase tracking-widest mt-6 opacity-80">{product.sections[0].subtitle}</p>
           </div>
         </section>
 
-        {/* Text Sections (Scrollytelling) */}
-        {/* We just render them normally. As usage scrolls, the fixed canvas updates. */}
-        <div className="flex flex-col">
-          {content.scrollytelling.map((item) => (
-            <TextSection
-              key={item.id}
-              title={item.text}
-              description={item.subtext}
-              align={item.align as "left" | "right" | "center"}
-            />
-          ))}
-        </div>
+        {/* 100vh - 200vh: Section 1 */}
+        <section className="h-screen w-full flex items-center justify-center">
+          <TextSection
+            title={product.sections[1].title}
+            description={product.sections[1].description}
+            align={product.sections[1].align as any}
+          />
+        </section>
 
-        <div className="h-[20vh]" /> {/* Extra breathing room */}
+        {/* 200vh - 300vh: Section 2 */}
+        <section className="h-screen w-full flex items-center justify-center">
+          <TextSection
+            title={product.sections[2].title}
+            description={product.sections[2].description}
+            align={product.sections[2].align as any}
+          />
+        </section>
 
-        <MarqueeStrip />
+        {/* 300vh - 400vh: Section 3 */}
+        <section className="h-screen w-full flex items-center justify-center">
+          <TextSection
+            title={product.sections[3].title}
+            description={product.sections[3].description}
+            align={product.sections[3].align as any}
+          />
+        </section>
 
-        <div className="bg-black/80 backdrop-blur-xl relative z-20 pb-20">
-          <SpecsGrid />
-          <CheckoutCard />
-          <footer className="w-full py-8 border-t border-white/5 bg-black text-center">
-            <p className="text-white/30 font-outfit text-xs tracking-widest uppercase">© 2026 CAP Coffee. All Rights Reserved.</p>
-          </footer>
-        </div>
+        {/* Buffer / Transition */}
+        <div className="h-[50vh] w-full" />
+
+        {/* Final Section */}
+        <section className="w-full py-24 flex flex-col items-center justify-center bg-gradient-to-t from-black via-black/80 to-transparent">
+          <BuyCard specs={product.specs} />
+        </section>
+
+        <Marquee />
+
+        <footer className="w-full py-6 bg-black text-center text-white/30 text-xs uppercase tracking-widest font-outfit">
+          © 2026 CAP Coffee. All Rights Reserved.
+        </footer>
       </div>
-
-      {/* Ensure total height is sufficient if content is short, but with sections it should be fine. 
-          If strictly following "wrapper with massive height", we could force it, 
-          but natural height is better for responsive. 
-          The user prompt "Outer Wrapper: A div with a massive height (e.g., h-[600vh])"
-          is essentially achieved by having multiple sections.
-      */}
     </main>
   );
 }

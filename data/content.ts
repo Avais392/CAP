@@ -1,39 +1,37 @@
-export const content = {
-    hero: {
-        title: "THE SIGNATURE CAP",
-        subtitle: "NO CAP, JUST COFFEE.",
-        badge: "Est. 2026"
-    },
-    scrollytelling: [
+export const product = {
+    id: "signature-cap",
+    name: "The Signature Cap",
+    price: "PKR 450",
+    folderPath: "/images/sequence", // 1.webp to 120.webp
+    totalFrames: 120,
+    sections: [
         {
-            id: 1,
-            text: "ESPRESSO YOURSELF.",
-            subtext: "A double shot of reality wrapped in velvety steamed milk. The city sleeps, but you don't.",
+            id: "hero",
+            title: "THE SIGNATURE CAP",
+            subtitle: "NO CAP, JUST COFFEE."
+        },
+        {
+            id: "flavor",
+            title: "ESPRESSO YOURSELF",
+            description: "A double shot of reality wrapped in velvety steamed milk. The city sleeps, but you don't.",
             align: "left"
         },
         {
-            id: 2,
-            text: "BREWTIFULLY BALANCED.",
-            subtext: "Not too bitter, not too sweet. Just the way life should be. Roasted locally, consumed globally.",
+            id: "roast",
+            title: "BREWTIFULLY BALANCED",
+            description: "Not too bitter, not too sweet. Just the way life should be. 100% Arabica, roasted in the city.",
             align: "right"
         },
         {
-            id: 3,
-            text: "BETTER LATTE THAN NEVER.",
-            subtext: "Served in our iconic Teal cup. It’s not just a drink; it’s an accessory.",
+            id: "vibe",
+            title: "BETTER LATTE THAN NEVER",
+            description: "Served in our iconic Teal cup. It’s not just a drink; it’s an accessory.",
             align: "center"
         }
     ],
     specs: [
-        { label: "Bean", value: "100% Arabica" },
+        { label: "Bean", value: "Arabica" },
         { label: "Roast", value: "City Medium" },
-        { label: "Caffeine", value: "80mg" },
-        { label: "Vibe", value: "Immaculate" }
-    ],
-    marquee: [
-        "WORDS CANNOT ESPRESSO HOW MUCH YOU MEAN TO ME",
-        "DEJA BREW",
-        "STAY GROUNDED",
-        "PROC-CAFFEINATING"
+        { label: "Caffeine", value: "High Voltage" }
     ]
 };
